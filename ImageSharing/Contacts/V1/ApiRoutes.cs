@@ -33,6 +33,8 @@ namespace ImageSharing.Contacts.V1
 
         public static class Images
         {
+            public const string Post = Base + "/images/upload";
+
             public const string GetAll = Base + "/images";
 
             public const string Get = Base + "/images/{imageId}";

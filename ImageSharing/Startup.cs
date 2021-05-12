@@ -1,21 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageSharing.Data;
 using ImageSharing.Options;
+using ImageSharing.Repo;
+using ImageSharing.Repo.Interfaces;
 using ImageSharing.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -44,8 +49,10 @@ namespace ImageSharing
             Configuration.Bind(nameof(jwtSettings), jwtSettings);
             services.AddSingleton(jwtSettings);
 
+            services.AddTransient<IImageRepo, ImageRepo>();
 
             services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IImageService, ImageService>();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -74,6 +81,8 @@ namespace ImageSharing
             services.AddSwaggerGen(x =>
             {
                 x.SwaggerDoc("v1", new OpenApiInfo { Title = "ImageSharing API", Version = "v1" });
+
+                x.MapType(typeof(IFormFile), () => new OpenApiSchema() { Type = "file", Format = "binary" });
 
                 x.AddSecurityDefinition("Bearer",
                     new OpenApiSecurityScheme
@@ -133,6 +142,13 @@ namespace ImageSharing
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(env.ContentRootPath, "Uploads")),
+                RequestPath = "/uploads"
+            });
            
             app.UseEndpoints(endpoints =>
             {
