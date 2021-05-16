@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ImageSharing.Extensions
 {
-    public static class HttpContextExtension
+    public static class GeneralExtensions
     {
         public static string GetUserId(this HttpContext httpContext)
         {
@@ -15,7 +15,7 @@ namespace ImageSharing.Extensions
                 return string.Empty;
             }
 
-            return httpContext.User.Claims.Single(x => x.Type == "username").Value;
+            return httpContext.User.Claims.Single(x => x.Type == "id").Value;
         }
     }
 }

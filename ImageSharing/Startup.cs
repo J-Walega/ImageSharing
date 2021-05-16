@@ -53,6 +53,7 @@ namespace ImageSharing
 
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<ICommentService, CommentService>();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 

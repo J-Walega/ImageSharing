@@ -34,7 +34,7 @@ namespace ImageSharing.Extensions
 
         public string GetErrorMessage()
         {
-            return $"This photo extension is not allowed!";
+            return $"Only jpg and png files allowed";
         }
     }
 }

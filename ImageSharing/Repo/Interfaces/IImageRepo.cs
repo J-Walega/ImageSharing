@@ -10,6 +10,7 @@ namespace ImageSharing.Repo.Interfaces
     {
         Task<bool> UploadImageAsync(Image image);
         Task<IEnumerable<Image>> GetImagesAsync();
+        Task<Image> GetImageByIdAsync(Guid imageId);
         Task<IEnumerable<Image>> GetUserImagesAsync(Guid userId);
         Task<bool> DeleteImageAsync(Image image);
     }

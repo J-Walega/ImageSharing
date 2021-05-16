@@ -63,5 +63,16 @@ namespace ImageSharing.Controllers.V1
                 Token = authResponse.Token
             });
         }
+
+        [HttpGet(ApiRoutes.Identity.GetUserByUsername)]
+        public async Task<IActionResult> GetUserById([FromRoute] string username)
+        {
+            var response = await _identityService.GetUserByName(username);
+            if(response == null)
+            {
+                return NoContent();
+            }
+            return Ok(response);
+        }
     }
 }

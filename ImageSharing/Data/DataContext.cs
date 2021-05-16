@@ -15,5 +15,6 @@ namespace ImageSharing.Data
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<Comment> Comments { get; set; }
     }
 }

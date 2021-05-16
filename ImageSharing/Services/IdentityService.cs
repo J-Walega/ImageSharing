@@ -47,7 +47,7 @@ namespace ImageSharing.Services
             {
                 return new AuthenticationResult
                 {
-                    Errors = new[] { "Something went wrong" }
+                    Errors = new[] { "Password must be at least 6 characters long and contain a number 1-9 and special character." }
                 };
             }
 
@@ -71,7 +71,23 @@ namespace ImageSharing.Services
             return GenerateAuthenticationResultForUser(user);
         }
 
-        private AuthenticationResult GenerateAuthenticationResultForUser(IdentityUser newUser)
+        public async Task<User> GetUserByName(string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if(user == null)
+            {
+                return null;
+            }
+            var response = new User()
+            {
+                UserId = new Guid(user.Id),
+                Username = user.UserName,
+                Email = user.Email
+            };
+            return response;
+        }
+
+        private AuthenticationResult GenerateAuthenticationResultForUser(IdentityUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
@@ -79,11 +95,11 @@ namespace ImageSharing.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, newUser.Email),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, newUser.Email),
-                    new Claim("id", newUser.Id),
-                    new Claim("username", newUser.UserName)
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim("id", user.Id),
+                    new Claim("username", user.UserName)
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -97,5 +113,7 @@ namespace ImageSharing.Services
                 Token = tokenHandler.WriteToken(token)
             };
         }
+
+
     }
 }

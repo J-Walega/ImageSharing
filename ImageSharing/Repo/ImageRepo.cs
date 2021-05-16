@@ -17,6 +17,12 @@ namespace ImageSharing.Repo
             _context = context;
         }
 
+        public async Task<Image> GetImageByIdAsync(Guid imageId)
+        {
+            var image = await _context.Images.FirstOrDefaultAsync(u => u.Id == imageId);
+            return image;
+        }
+
         public async Task<bool> DeleteImageAsync(Image image)
         {
             _context.Images.Remove(image);
@@ -34,7 +40,7 @@ namespace ImageSharing.Repo
         public async Task<IEnumerable<Image>> GetUserImagesAsync(Guid userId)
         {
             var images = await _context.Images
-                .Where(u => u.Id == userId)
+                .Where(u => u.UserId == userId.ToString())
                 .ToListAsync();
 
             return images;

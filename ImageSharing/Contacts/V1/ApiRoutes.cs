@@ -28,7 +28,9 @@ namespace ImageSharing.Contacts.V1
         {
             public const string Login = Base + "/identity/login";
 
-            public const string Register = Base + "/identity/register"; 
+            public const string Register = Base + "/identity/register";
+
+            public const string GetUserByUsername = Base + "/identity/user/{username}";
         }
 
         public static class Images
@@ -38,6 +40,10 @@ namespace ImageSharing.Contacts.V1
             public const string GetAll = Base + "/images";
 
             public const string Get = Base + "/images/{imageId}";
+
+            public const string GetUserImages = Base + "/images/user";
+
+            public const string Delete = Base + "/images/{imageId}";
         }
     }
 }

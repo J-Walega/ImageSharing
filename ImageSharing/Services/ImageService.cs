@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ImageSharing.Contacts.V1.Responses;
 using ImageSharing.Data;
 using ImageSharing.Domain;
 using ImageSharing.Options;
 using ImageSharing.Repo.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
 namespace ImageSharing.Services
@@ -14,31 +17,116 @@ namespace ImageSharing.Services
     {
         private readonly IImageRepo _imageRepo;
         private readonly JwtSettings _jwtSettings;
+        private readonly IWebHostEnvironment _enviromnent;
 
-        public ImageService(IImageRepo imageRepo, JwtSettings jwtSettings)
+        public ImageService(IImageRepo imageRepo, JwtSettings jwtSettings, IWebHostEnvironment environment)
         {
             _imageRepo = imageRepo;
             _jwtSettings = jwtSettings;
+            _enviromnent = environment;
         }
 
-        public Task<bool> DeleteImageAsync(string username, Guid imageId)
+        public async Task<DeleteImageResponse> DeleteImageByIdAsync(Guid imageId, Guid userId)
         {
-            throw new NotImplementedException();
+
+            var image = await _imageRepo.GetImageByIdAsync(imageId);
+            if (userId.ToString() != image.UserId)
+            {
+                return new DeleteImageResponse()
+                {
+                    Success = false,
+                    Message = "You don't have permission to delete other users image"
+                };
+            }
+            if (image == null)
+            {
+                return new DeleteImageResponse()
+                {
+                    Success = false,
+                    Message = "Image doesn't exist"
+                };
+            }
+            var delete = await _imageRepo.DeleteImageAsync(image);
+            return new DeleteImageResponse()
+            {
+                Success = true,
+                Message = "Deleted"
+            };
+        }        
+
+        public async Task<Image> GetImageByIdAsync(Guid imageId)
+        {
+            var image = await _imageRepo.GetImageByIdAsync(imageId);
+
+            return image;
         }
 
-        public Task<Image> GetImagesAsync()
+        public async Task<List<Image>> GetImagesAsync()
         {
-            throw new NotImplementedException();
+            var images = await _imageRepo.GetImagesAsync();
+
+            var response = new List<Image>();
+
+            foreach (var image in images)
+            {
+                response.Add(image);
+            }
+            return response;
         }
 
-        public Task<Image> GetImagesByUsername(string username)
+        public async Task<List<Image>> GetImagesByUserId(string userId)
         {
-            throw new NotImplementedException();
+            Guid id = new Guid(userId);
+            var images = await _imageRepo.GetUserImagesAsync(id);
+
+            var response = new List<Image>();
+
+            foreach(var image in images)
+            {
+                response.Add(image);
+            }
+
+            return response;
         }
 
-        public Task<bool> UploadImageAsync(IFormFile image, string title)
+        public async Task<UploadImageResult> UploadImageAsync(IFormFile image, string title, string userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (!Directory.Exists(_enviromnent.ContentRootPath + $"\\Uploads\\{userId}\\"))
+                {
+                    Directory.CreateDirectory(_enviromnent.ContentRootPath + $"\\Uploads\\{userId}\\");
+                }
+                var imageName = Guid.NewGuid();
+
+                using (FileStream fileStream = System.IO.File.Create(_enviromnent.ContentRootPath + "\\Uploads\\" + userId + "\\" + imageName + image.FileName))
+                {
+                    await image.CopyToAsync(fileStream);
+                    
+                    Image imageModel = new Image()
+                    {
+                        Id = new Guid(),
+                        UserId = userId,
+                        Title = title,
+                        Path = $"/Uploads/{userId}/{imageName}{image.FileName}"
+                    };
+
+                    fileStream.Flush();
+                    await _imageRepo.UploadImageAsync(imageModel);
+
+                    return new UploadImageResult()
+                    {
+                        Success = true,
+                        Error = ""
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
         }
     }
 }
