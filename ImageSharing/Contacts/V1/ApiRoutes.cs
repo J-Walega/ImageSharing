@@ -11,19 +11,6 @@ namespace ImageSharing.Contacts.V1
         public const string Version = "v1";
         public const string Base = Root + "/" + Version;
 
-        public static class Posts
-        {
-            public const string GetAll = Base + "/posts";
-
-            public const string Update = Base + "/posts/{postId}";
-
-            public const string Delete = Base + "/posts/{postId}";
-
-            public const string Get = Base + "/posts/{postId}";
-
-            public const string Create = Base + "/posts";
-        }
-
         public static class Identity
         {
             public const string Login = Base + "/identity/login";
@@ -44,6 +31,15 @@ namespace ImageSharing.Contacts.V1
             public const string GetUserImages = Base + "/images/user";
 
             public const string Delete = Base + "/images/{imageId}";
+        }
+
+        public static class Comments
+        {
+            public const string Post = Base + "/comments/post";
+
+            public const string Patch = Base + "/comments/patch/{commentId}";
+
+            public const string GetImageComments = Base + "/comments/get/{imageId}";
         }
     }
 }

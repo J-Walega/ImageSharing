@@ -126,7 +126,6 @@ namespace ImageSharing.Services
             {
                 throw new Exception(ex.Message);
             }
-
         }
     }
 }

@@ -12,12 +12,9 @@ namespace ImageSharing.Domain
     {
         [Key]
         public Guid Id { get; set; }
-        public string UserId { get; set; }
+        public string Username { get; set; }
         public Guid ImageId { get; set; }
         public string Content { get; set; }
-
-        [ForeignKey(nameof(UserId))]
-        public IdentityUser User { get; set; }
 
         [ForeignKey(nameof(ImageId))]
         public Image Image { get; set; }

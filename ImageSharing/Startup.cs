@@ -50,6 +50,7 @@ namespace ImageSharing
             services.AddSingleton(jwtSettings);
 
             services.AddTransient<IImageRepo, ImageRepo>();
+            services.AddTransient<ICommentRepo, CommentRepo>();
 
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IImageService, ImageService>();

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ImageSharing.Contacts.V1;
 using ImageSharing.Contacts.V1.Requests;
 using ImageSharing.Contacts.V1.Responses;
+using ImageSharing.Domain;
 using ImageSharing.Extensions;
 using ImageSharing.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -104,8 +105,6 @@ namespace ImageSharing.Controllers.V1
                 Success = response.Success,
                 Message = response.Message
             });
-        }
-
-       
+        }  
     }
 }

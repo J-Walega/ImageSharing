@@ -8,7 +8,9 @@ namespace ImageSharing.Repo.Interfaces
 {
     public interface ICommentRepo
     {
-        public Task<bool> AddCommentAsync(Comment comment, string userId, Guid imageId);
+        public Task<bool> AddCommentAsync(Comment comment);
         public Task<IEnumerable<Comment>> GetCommentsByImageIdAsync(Guid imageId);
+        public Task<bool> UpdateCommentAsync(Comment updatedComment);
+        public Comment GetCommentById(Guid id);
     }
 }

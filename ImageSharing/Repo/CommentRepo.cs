@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ImageSharing.Data;
 using ImageSharing.Domain;
 using ImageSharing.Repo.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ImageSharing.Repo
 {
@@ -17,15 +18,34 @@ namespace ImageSharing.Repo
             _context = context;
         }
 
-        public async Task<bool> AddCommentAsync(Comment comment, string userId, Guid imageId)
+        public async Task<bool> AddCommentAsync(Comment comment)
         {
             await _context.AddAsync(comment);
             return await SaveChanges();
         }
 
-        public Task<IEnumerable<Comment>> GetCommentsByImageIdAsync(Guid imageId)
+        public async Task<IEnumerable<Comment>> GetCommentsByImageIdAsync(Guid imageId)
         {
-            throw new NotImplementedException();
+            var comments = await _context.Comments
+                .Where(u => u.ImageId == imageId)
+                .ToListAsync();
+            return comments;
+        }
+
+        public Comment GetCommentById(Guid id)
+        {
+            var comment = _context.Comments
+                .Where(u => u.Id == id)
+                .FirstOrDefault();
+            return comment;
+        }
+
+        public async Task<bool> UpdateCommentAsync(Comment updatedComment)
+        {
+            _context.Entry(await _context.Comments
+                .FirstOrDefaultAsync(x => x.Id == updatedComment.Id))
+                .CurrentValues.SetValues(updatedComment);
+            return await SaveChanges();
         }
 
         private async Task<bool> SaveChanges()
