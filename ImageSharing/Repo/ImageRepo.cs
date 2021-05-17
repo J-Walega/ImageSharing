@@ -32,6 +32,8 @@ namespace ImageSharing.Repo
         public async Task<IEnumerable<Image>> GetImagesAsync()
         {
             var images = await _context.Images
+                .OrderByDescending(d => d.UploadDate)
+                .Take(10)
                 .ToListAsync();
 
             return images;
@@ -41,6 +43,7 @@ namespace ImageSharing.Repo
         {
             var images = await _context.Images
                 .Where(u => u.UserId == userId.ToString())
+                .Take(10)
                 .ToListAsync();
 
             return images;
